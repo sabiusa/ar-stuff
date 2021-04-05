@@ -13,6 +13,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
     
+    var earth = SCNNode()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -44,6 +46,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         drawPyramidAt600Low()
         drawPlaneAt900()
         drawTorusAt300()
+        drawOrbitingShip()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -64,7 +67,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     func drawEarthAtOrigin() {
         let geometry = SCNSphere(radius: 0.05)
-        let earth = SCNNode(geometry: geometry)
+        earth = SCNNode(geometry: geometry)
         earth.geometry?.firstMaterial?.diffuse.contents = UIImage(named: "earth")
         earth.geometry?.firstMaterial?.specular.contents = UIColor.yellow
         earth.position = SCNVector3(x: 0, y: 0, z: 0)
@@ -120,6 +123,16 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         torus.geometry?.firstMaterial?.specular.contents = UIColor.white
         
         sceneView.scene.rootNode.addChildNode(torus)
+    }
+    
+    func drawOrbitingShip() {
+        let scene = SCNScene(named: "art.scnassets/ship.scn")
+        let ship = (scene?.rootNode.childNode(withName: "ship", recursively: false))!
+        ship.position = SCNVector3(x: 1, y: 0, z: 0)
+        ship.scale = SCNVector3(x: 0.3, y: 0.3, z: 0.3)
+        ship.eulerAngles = SCNVector3(x: 0, y: .pi, z: 0)
+        
+        earth.addChildNode(ship)
     }
 }
 
