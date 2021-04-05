@@ -39,7 +39,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Run the view's session
         sceneView.session.run(configuration)
         
-        drawSphereAtOrigin()
+        drawEarthAtOrigin()
         drawBoxAt1200High()
         drawPyramidAt600Low()
     }
@@ -58,6 +58,16 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sphere.position = SCNVector3(x: 0, y: 0, z: 0)
         
         sceneView.scene.rootNode.addChildNode(sphere)
+    }
+    
+    func drawEarthAtOrigin() {
+        let geometry = SCNSphere(radius: 0.05)
+        let earth = SCNNode(geometry: geometry)
+        earth.geometry?.firstMaterial?.diffuse.contents = UIImage(named: "earth")
+        earth.geometry?.firstMaterial?.specular.contents = UIColor.yellow
+        earth.position = SCNVector3(x: 0, y: 0, z: 0)
+        
+        sceneView.scene.rootNode.addChildNode(earth)
     }
     
     func drawBoxAt1200High() {
