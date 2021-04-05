@@ -27,6 +27,18 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Set the scene to the view
         sceneView.scene = scene
+        
+        let box = SCNBox(width: 0.3, height: 0.3, length: 0.3, chamferRadius: 0)
+        
+        let material = SCNMaterial()
+        material.diffuse.contents = UIColor.red
+        
+        box.materials = [material]
+        
+        let boxNode = SCNNode(geometry: box)
+        boxNode.position = SCNVector3(x: 0.25, y: 0, z: -1)
+        
+        sceneView.scene.rootNode.addChildNode(boxNode)
     }
     
     override func viewWillAppear(_ animated: Bool) {
