@@ -70,6 +70,15 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         earth.position = SCNVector3(x: 0, y: 0, z: 0)
         
         sceneView.scene.rootNode.addChildNode(earth)
+        
+        let rotateAction = SCNAction.rotate(
+            by: 2 * .pi,
+            around: SCNVector3(x: 0, y: 1, z: 0),
+            duration: 8
+        )
+        let rotateForeverAction = SCNAction.repeatForever(rotateAction)
+        
+        earth.runAction(rotateForeverAction)
     }
     
     func drawBoxAt1200High() {
