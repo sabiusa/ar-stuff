@@ -41,6 +41,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         drawSphereAtOrigin()
         drawBoxAt1200High()
+        drawPyramidAt600Low()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -67,5 +68,15 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         box.geometry?.firstMaterial?.specular.contents = UIColor.white
         
         sceneView.scene.rootNode.addChildNode(box)
+    }
+    
+    func drawPyramidAt600Low() {
+        let geometry = SCNPyramid(width: 0.1, height: 0.1, length: 0.1)
+        let pyramid = SCNNode(geometry: geometry)
+        pyramid.position = SCNVector3(x: 0, y: -0.2, z: 0.3)
+        pyramid.geometry?.firstMaterial?.diffuse.contents = UIColor.green
+        pyramid.geometry?.firstMaterial?.specular.contents = UIColor.red
+        
+        sceneView.scene.rootNode.addChildNode(pyramid)
     }
 }
