@@ -43,6 +43,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         drawBoxAt1200High()
         drawPyramidAt600Low()
         drawPlaneAt900()
+        drawTorusAt300()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -99,5 +100,23 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         cat.geometry?.firstMaterial?.isDoubleSided = true
         
         sceneView.scene.rootNode.addChildNode(cat)
+    }
+    
+    func drawTorusAt300() {
+        let geometry = SCNTorus(ringRadius: 0.05, pipeRadius: 0.03)
+        let torus = SCNNode(geometry: geometry)
+        torus.position = SCNVector3(x: 0.2, y: 0, z: 0)
+        torus.eulerAngles = SCNVector3(x: .pi / 4, y: 0, z: 0)
+        torus.geometry?.firstMaterial?.diffuse.contents = UIColor.red
+        torus.geometry?.firstMaterial?.specular.contents = UIColor.white
+        
+        sceneView.scene.rootNode.addChildNode(torus)
+    }
+}
+
+extension Int {
+    
+    func toRadians() -> CGFloat {
+        return CGFloat(self) * .pi / 180
     }
 }
