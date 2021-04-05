@@ -27,6 +27,15 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Set the scene to the view
         sceneView.scene = scene
+        
+        let text = SCNText(string: "Hello", extrusionDepth: 0.1)
+        text.firstMaterial?.diffuse.contents = UIColor.orange
+        
+        let textNode = SCNNode(geometry: text)
+        textNode.position = SCNVector3(x: 0, y: 0, z: -1)
+        textNode.scale = SCNVector3(x: 0.02, y: 0.02, z: 0.02)
+        
+        sceneView.scene.rootNode.addChildNode(textNode)
     }
     
     override func viewWillAppear(_ animated: Bool) {
