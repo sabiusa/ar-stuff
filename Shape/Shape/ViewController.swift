@@ -40,6 +40,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.session.run(configuration)
         
         drawSphereAtOrigin()
+        drawBoxAt1200High()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -56,5 +57,15 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sphere.position = SCNVector3(x: 0, y: 0, z: 0)
         
         sceneView.scene.rootNode.addChildNode(sphere)
+    }
+    
+    func drawBoxAt1200High() {
+        let geometry = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0)
+        let box = SCNNode(geometry: geometry)
+        box.position = SCNVector3(x: 0, y: 0.2, z: -0.3)
+        box.geometry?.firstMaterial?.diffuse.contents = UIColor.orange
+        box.geometry?.firstMaterial?.specular.contents = UIColor.white
+        
+        sceneView.scene.rootNode.addChildNode(box)
     }
 }
