@@ -203,11 +203,15 @@ class RoomViewController: UIViewController, ARSCNViewDelegate {
     // an *existing* AR anchor is updated.
     func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
         // Once again, we only want to deal with plane anchors.
+        guard let planeAnchor = anchor as? ARPlaneAnchor else { return }
         
         // Remove any children this node may have.
+        node.childNodes.forEach { child in
+            child.removeFromParentNode()
+        }
         
         // Update the plane over this surface.
-        
+        drawPlaneNode(on: node, for: planeAnchor)
     }
     
     func drawPlaneNode(on node: SCNNode, for planeAnchor: ARPlaneAnchor) {
