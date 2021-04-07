@@ -196,14 +196,7 @@ class RoomViewController: UIViewController, ARSCNViewDelegate {
         guard let planeAnchor = anchor as? ARPlaneAnchor else { return }
         
         // Draw the appropriate plane over the detected surface.
-        let planeType: String
-        if planeAnchor.alignment == .horizontal {
-            planeType = "horizontal"
-        } else {
-            planeType = "vertical"
-        }
-        
-        print("Found a \(planeType) surface at: (x: \(planeAnchor.center.x), y: \(planeAnchor.center.y), z: \(planeAnchor.center.z))")
+        drawPlaneNode(on: node, for: planeAnchor)
     }
     
     // This delegate method gets called whenever the node for
@@ -220,13 +213,29 @@ class RoomViewController: UIViewController, ARSCNViewDelegate {
     func drawPlaneNode(on node: SCNNode, for planeAnchor: ARPlaneAnchor) {
         // Create a plane node with the same position and size
         // as the detected plane.
+        let geometry = SCNPlane(
+            width: CGFloat(planeAnchor.extent.x),
+            height: CGFloat(planeAnchor.extent.z)
+        )
+        let plane = SCNNode(geometry: geometry)
+        plane.position = SCNVector3(planeAnchor.center)
+        plane.geometry?.firstMaterial?.isDoubleSided = true
         
         // Align the plane with the anchor.
+        plane.eulerAngles = SCNVector3(x: -.pi / 2, y: 0, z: 0)
         
         // Give the plane node the appropriate surface.
+        if planeAnchor.alignment == .horizontal {
+            plane.geometry?.firstMaterial?.diffuse.contents = UIImage(named: "grid")
+            plane.name = "horizontal"
+        } else {
+            plane.geometry?.firstMaterial?.diffuse.contents = UIColor.red
+            plane.name = "vertical"
+        }
         
         // Add the plane node to the scene.
-        
+        node.addChildNode(plane)
+        appState = .readyToFurnish
     }
     
     // This delegate method gets called whenever the node corresponding to
