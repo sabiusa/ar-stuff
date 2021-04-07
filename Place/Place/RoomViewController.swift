@@ -246,9 +246,12 @@ class RoomViewController: UIViewController, ARSCNViewDelegate {
     // an existing AR anchor is removed.
     func renderer(_ renderer: SCNSceneRenderer, didRemove node: SCNNode, for anchor: ARAnchor) {
         // We only want to deal with plane anchors.
+        guard anchor is ARPlaneAnchor else { return }
         
         // Remove any children this node may have.
-        
+        node.childNodes.forEach { child in
+            child.removeFromParentNode()
+        }
     }
     
     
