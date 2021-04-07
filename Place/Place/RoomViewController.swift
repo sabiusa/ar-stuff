@@ -268,22 +268,32 @@ class RoomViewController: UIViewController, ARSCNViewDelegate {
     
     @objc func handleScreenTap(sender: UITapGestureRecognizer) {
         // Find out where the user tapped on the screen.
+        let tappedSceneView = sender.view as! ARSCNView
+        let tapLocation = sender.location(in: tappedSceneView)
         
         // Find all the detected planes that would intersect with
         // a line extending from where the user tapped the screen.
+        let planeIntersections = tappedSceneView.hitTest(tapLocation, types: .estimatedHorizontalPlane)
         
         // If the closest of those planes is horizontal,
         // put the current furniture item on it.
-        
+        if !planeIntersections.isEmpty {
+            addFurniture(hitTestResult: planeIntersections.first!)
+        }
     }
     
     func addFurniture(hitTestResult: ARHitTestResult) {
         // Get the real-world position corresponding to
         // where the user tapped on the screen.
+        let transform = hitTestResult.worldTransform
+        let positionColumn = transform.columns.3
+        let initialPosition = SCNVector3(x: positionColumn.x, y: positionColumn.y, z: positionColumn.z)
         
         // Get the current furniture item, correct its position if necessary,
         // and add it to the scene.
-        
+        let node = furnitureSettings.currentFurniturePiece()
+        node.position = initialPosition + furnitureSettings.currentFurnitureOffset()
+        sceneView.scene.rootNode.addChildNode(node)
     }
     
     @IBAction func clearButtonPressed(_ sender: Any) {
