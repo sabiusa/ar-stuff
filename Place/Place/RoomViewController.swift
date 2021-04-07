@@ -177,8 +177,11 @@ class RoomViewController: UIViewController, ARSCNViewDelegate {
                 let point = CGPoint(x: xCoord, y: yCoord)
                 
                 // Perform hit test for planes.
+                let hitTests = sceneView.hitTest(point, types: .estimatedHorizontalPlane)
                 
-                
+                if !hitTests.isEmpty {
+                    return true
+                }
             }
         }
         return false
