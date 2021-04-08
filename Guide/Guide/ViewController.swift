@@ -169,8 +169,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Draw the appropriate plane over the image.
         updateQueue.async {
-            var planeNode = SCNNode()
-            
+            var planeNode = self.createArtworkPlaneNode(withReferenceImage: referenceImage, andImageName: imageName)
+            planeNode.eulerAngles.x = -.pi / 2
+            node.addChildNode(planeNode)
             
             if isArtImage {
                 // If the detected artwork is one that we’d like to highlight (and one which we’d
@@ -212,8 +213,27 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     func createArtworkPlaneNode(withReferenceImage referenceImage: ARReferenceImage,
                                 andImageName imageName: String) -> SCNNode {
         
+        let flashAction = SCNAction.sequence([
+            .wait(duration: 25),
+            .fadeOpacity(to: 0.85, duration: 0.25),
+            .fadeOpacity(to: 0.25, duration: 0.25),
+            .fadeOpacity(to: 0.85, duration: 0.25),
+            .fadeOpacity(to: 0.25, duration: 0.25),
+            .fadeOpacity(to: 0.85, duration: 0.25),
+            .fadeOpacity(to: 0.25, duration: 0.25),
+        ])
+        
         // Draw the plane.
-        return SCNNode()
+        let geometry = SCNPlane(
+            width: referenceImage.physicalSize.width * 1.5,
+            height: referenceImage.physicalSize.height * 1.5
+        )
+        let plane = SCNNode(geometry: geometry)
+        plane.opacity = 0.25
+        plane.runAction(flashAction)
+        plane.name = imageName
+        
+        return plane
     }
     
     // Create an opaque plane featuring the soothing image of Ray Wenderlich,
