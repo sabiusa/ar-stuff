@@ -159,8 +159,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let referenceImage = imageAnchor.referenceImage
         let imageName = referenceImage.name ?? "[Unknown]"
         
-        let isArtImage = true
-        var statusMessage = "Found \(artworkDisplayNames[imageName] ?? "artwork")"
+        let isArtImage = !imageName.hasPrefix("block_this-")
+        var statusMessage = isArtImage
+            ? "Found \(artworkDisplayNames[imageName] ?? "artwork")"
+            : "Unpleasant image blocked"
         
         DispatchQueue.main.async {
             self.statusViewController.cancelAllScheduledMessages()
@@ -169,27 +171,33 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Draw the appropriate plane over the image.
         updateQueue.async {
-            var planeNode = self.createArtworkPlaneNode(withReferenceImage: referenceImage, andImageName: imageName)
-            planeNode.eulerAngles.x = -.pi / 2
-            node.addChildNode(planeNode)
+            var planeNode = SCNNode()
+            
+            
+            
             
             if isArtImage {
                 // If the detected artwork is one that we’d like to highlight (and one which we’d
                 // like the user to tap to find out more), draw an “artwork” plane and
                 // the name of the artwork over the image.
+                planeNode = self.createArtworkPlaneNode(withReferenceImage: referenceImage, andImageName: imageName)
                 
+                let nameNode = self.createArtworkNameNode(withImageName: imageName)
+                node.addChildNode(nameNode)
             } else {
                 // If the detected artwork is one that we’d like to obscure,
                 // draw a “blocker” plane over the image.
                 
+                planeNode = self.createBlockerPlaneNode(withReferenceImage: referenceImage, andImageName: imageName)
+                planeNode.name = self.blockedName
             }
             
             // Rotate the newly-created plane by 90 degrees clockwise around the x-axis
             // so that it’s vertical.
-            
+            planeNode.eulerAngles.x = -.pi / 2
             
             // Add the plane node to the scene.
-            
+            node.addChildNode(planeNode)
         }
         
         DispatchQueue.main.async {
@@ -241,8 +249,15 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     // Yes, we’re in “Black Mirror” territory now.
     func createBlockerPlaneNode(withReferenceImage referenceImage: ARReferenceImage,
                                 andImageName imageName: String) -> SCNNode {
-        // Draw the plane.
-        return SCNNode()
+        let geometry = SCNPlane(
+            width: referenceImage.physicalSize.width * 2,
+            height: referenceImage.physicalSize.height * 2
+        )
+        let plane = SCNNode(geometry: geometry)
+        plane.geometry?.firstMaterial?.diffuse.contents = UIColor.red
+        plane.name = imageName
+        
+        return plane
     }
     
     // Create a text node to display the name of an artwork.
@@ -252,7 +267,32 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let textSize: CGFloat = 0.2
         let textDepth: CGFloat = 0.02
         
-        return SCNNode()
+        let artworkNameText = SCNText(string: artworkDisplayNames[imageName], extrusionDepth: 0.02)
+        artworkNameText.font = UIFont(name: textFont, size: textSize)?.withTraits(traits: .traitBold)
+        artworkNameText.alignmentMode = CATextLayerAlignmentMode.center.rawValue
+        
+        artworkNameText.firstMaterial?.diffuse.contents = UIColor.orange
+        artworkNameText.firstMaterial?.specular.contents = UIColor.white
+        
+        artworkNameText.firstMaterial?.isDoubleSided = true
+        artworkNameText.chamferRadius = CGFloat(textDepth)
+        
+        let node = SCNNode(geometry: artworkNameText)
+        node.scale = SCNVector3(x: textScaleFactor, y: textScaleFactor, z: textScaleFactor)
+        node.name = imageName
+        
+        let (minBound, maxBound) = artworkNameText.boundingBox
+        node.pivot = SCNMatrix4MakeTranslation(
+            (maxBound.x - minBound.x) / 2,
+            minBound.y,
+            0
+        )
+        
+        let billboardConstraint = SCNBillboardConstraint()
+        billboardConstraint.freeAxes = SCNBillboardAxis.Y
+        node.constraints = [billboardConstraint]
+        
+        return node
     }
     
 }
