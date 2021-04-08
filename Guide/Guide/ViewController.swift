@@ -119,10 +119,13 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 
   func startARSession() {
     // Make sure that we have an AR resource group.
-
+    guard let referenceImages = ARReferenceImage.referenceImages(inGroupNamed: "AR Resources", bundle: nil) else {
+        fatalError("No reference images!")
+    }
 
     // Set up the AR configuration.
-
+    config.worldAlignment = .gravityAndHeading
+    config.detectionImages = referenceImages
 
     // Start the AR session.
     sceneView.session.run(config, options: [.resetTracking, .removeExistingAnchors])
@@ -152,8 +155,17 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     // We only want to deal with image anchors, which encapsulate
     // the position, orientation, and size, of a detected image that matches
     // one of our reference images.
+    guard let imageAnchor = anchor as? ARImageAnchor else { return }
+    let referenceImage = imageAnchor.referenceImage
+    let imageName = referenceImage.name ?? "[Unknown]"
+    
     let isArtImage = true
-    var statusMessage = ""
+    var statusMessage = "Found \(artworkDisplayNames[imageName] ?? "artwork")"
+    
+    DispatchQueue.main.async {
+        self.statusViewController.cancelAllScheduledMessages()
+        self.statusViewController.showMessage(statusMessage)
+    }
 
     // Draw the appropriate plane over the image.
     updateQueue.async {
